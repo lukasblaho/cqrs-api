@@ -29,7 +29,7 @@ class GetEventsAction
 
         $iterator = $this->eventStore->iterate($previousEventId);
 
-        $selfUrl = $request->getUri();
+        $selfUrl = (string) $request->getUri();
 
         $lastEventId = $previousEventId;
         $events = [];
@@ -45,7 +45,7 @@ class GetEventsAction
             $lastEventId = $event->getId()->toString();
         }
 
-        $nextUrl = $request->getUri()->withQuery(http_build_query([
+        $nextUrl = (string) $request->getUri()->withQuery(http_build_query([
             'previousEventId' => (string)$lastEventId,
         ]));
 
