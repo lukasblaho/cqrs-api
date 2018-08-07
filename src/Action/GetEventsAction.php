@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace CQRSApi\Action;
 
@@ -6,17 +7,21 @@ use CQRS\Domain\Message\EventMessageInterface;
 use CQRS\EventStore\EventStoreInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Ramsey\Uuid\Uuid;
 use Zend\Diactoros\Response\JsonResponse;
 
-class GetEventsAction
+final class GetEventsAction implements RequestHandlerInterface
 {
+    /** @var EventStoreInterface  */
+    private $eventStore;
+
     public function __construct(EventStoreInterface $eventStore)
     {
         $this->eventStore = $eventStore;
     }
 
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, callable $next = null)
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $queryParams = $request->getQueryParams();
 
@@ -34,6 +39,7 @@ class GetEventsAction
         $lastEventId = $previousEventId;
         $events = [];
         $i = 0;
+
         /** @var EventMessageInterface $event */
         foreach ($iterator as $event) {
             if ($i >= $count) {
